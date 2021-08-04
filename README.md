@@ -10,7 +10,7 @@ A small Event System written as C++20 library.
 
 ## License
 
-GPLv3
+MPLv2
 
 ## Rest
 T.b.d.
