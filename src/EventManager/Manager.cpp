@@ -324,3 +324,10 @@
      schedulingParticipants_.push_back(participant);
    }
  }
+
+
+ void EventManager::Manager::connect(std::shared_ptr<EventManager::Participant> participant)
+ {
+   participant->setManager(shared_from_this());
+   participant->init();
+ }

@@ -64,6 +64,14 @@
       */
       virtual void schedule_() { throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " not implemented");}
 
+      /**
+      * @brief method called by the EventManager::Manager on connecting this particpant
+      *
+      * This method need to be implemented by each child class of EventManager::Participant
+      * Its the best location for subscribing to events and enable scheduling if required.
+      */
+      virtual void init_() {throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + " not implemented");}
+
 
     protected:
 
@@ -141,6 +149,12 @@
       */
       void schedule() {schedule_();};
 
+      /**
+      * @brief method called by the EventManager::Manager when connecting the particpant
+      *
+      * method calls virtual _init method which has to be implemented by each particpants child class
+      */
+      void init() {init_();}
 
       /**
       * @brief emit an event to this participant

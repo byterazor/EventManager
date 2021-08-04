@@ -28,7 +28,7 @@
    // forward declaration of EventManager::Participant
    class Participant;
 
-   class Manager
+   class Manager : public std::enable_shared_from_this<Manager>
    {
      /// the thread the event manager is transmitting events in
      std::unique_ptr<std::thread> mainThread_;
@@ -184,6 +184,17 @@
       * @param plugin - the plugin to schedule
       */
       void schedule(std::shared_ptr<EventManager::Participant> plugin);
+
+
+      /**
+      * @brief method to connect a particpant to the manager
+      */
+      void connect(std::shared_ptr<EventManager::Participant> participant);
+
+      /**
+      * @brief method to disconnect a particpant from the manager
+      */
+      void disconnect(std::shared_ptr<EventManager::Participant> participant);
 
    }; // class Manager
 

@@ -33,6 +33,11 @@ class myParticipant : public EventManager::Participant
       _unsubscribe();
     }
 
+    void init_() {
+      _subscribe(eventType_);
+      _enableScheduling();
+    }
+
     void schedule_() {
       std::shared_ptr<EventManager::Event> event = nullptr;
 
@@ -67,10 +72,7 @@ class myParticipant : public EventManager::Participant
 
     bool eventReceived() const { return receivedEvent_;}
 
-    void init() {
-      _subscribe(eventType_);
-      _enableScheduling();
-    }
+
 };
 
 
@@ -91,8 +93,7 @@ SCENARIO("Basic Usage of EventManager", "[Manager]")
     REQUIRE_NOTHROW([&]()
     {
       participant0 = std::make_shared<myParticipant>(0,TEST_EVENT0);
-      participant0->setManager(manager);
-      participant0->init();
+      manager->connect(participant0);
     }());
 
     REQUIRE(manager->empty() == false);
@@ -101,8 +102,7 @@ SCENARIO("Basic Usage of EventManager", "[Manager]")
     REQUIRE_NOTHROW([&]()
     {
       participant1 = std::make_shared<myParticipant>(1,TEST_EVENT1);
-      participant1->setManager(manager);
-      participant1->init();
+      manager->connect(participant1);
     }());
 
     REQUIRE(manager->empty() == false);
