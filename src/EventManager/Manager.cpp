@@ -331,3 +331,8 @@
    participant->setManager(shared_from_this());
    participant->init();
  }
+
+ void EventManager::Manager::disconnect(std::shared_ptr<EventManager::Participant> participant)
+ {
+   participant->setManager(nullptr);
+ }
