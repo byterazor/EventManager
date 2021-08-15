@@ -18,6 +18,25 @@ EventManager::Participant::Participant() : manager_(nullptr),
 
 }
 
+void EventManager::Participant::connect(std::shared_ptr<EventManager::Participant> participant)
+{
+  if (manager_ == nullptr)
+  {
+    throw std::runtime_error("no event manager set yet");
+  }
+  manager_->connect(participant);
+}
+
+void EventManager::Participant::disconnect(std::shared_ptr<EventManager::Participant> participant)
+{
+  if (manager_ == nullptr)
+  {
+    throw std::runtime_error("no event manager set yet");
+  }
+  manager_->disconnect(participant);
+}
+
+
 void EventManager::Participant::emit(std::shared_ptr<EventManager::Event> event)
 {
   {

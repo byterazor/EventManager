@@ -135,6 +135,16 @@
       */
       bool isScheduledByManager() const {return isScheduledByManager_;}
 
+      /**
+      * @brief connect a new participant through another participant
+      */
+      void connect(std::shared_ptr<EventManager::Participant> participant);
+
+      /**
+      * @brief disconnect a participant through another participant
+      */
+      void disconnect(std::shared_ptr<EventManager::Participant> participant);
+
     public:
       /**
       * @brief Constructor setting the participant up for use
