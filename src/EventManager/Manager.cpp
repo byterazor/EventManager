@@ -328,11 +328,28 @@
 
  void EventManager::Manager::connect(std::shared_ptr<EventManager::Participant> participant)
  {
+   std::lock_guard<std::mutex> guard(mutexParticipants_);
+   particpants_.push_back(participant);
    participant->setManager(shared_from_this());
    participant->init();
  }
 
  void EventManager::Manager::disconnect(std::shared_ptr<EventManager::Participant> participant)
  {
+
+   disconnect(participant);
+   
+   std::lock_guard<std::mutex> guard(mutexParticipants_);
+   std::list<std::shared_ptr<EventManager::Participant>>::iterator it;
+
+   it = std::find(particpants_.begin(), particpants_.end(),participant);
+
+   if (it != particpants_.end())
+   {
+     particpants_.erase(it);
+   }
+
+
+
    participant->setManager(nullptr);
  }

@@ -66,6 +66,12 @@
      /// mutex to protect schedulingPlugins_
      std::mutex mutexSchedulingParticipants_;
 
+     /// list of all participants connected
+     std::list<std::shared_ptr<EventManager::Participant>> particpants_;
+
+     /// mutex to protect participants_
+     std::mutex mutexParticipants_;
+
      /*
      * all private methods
      */
