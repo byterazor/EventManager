@@ -100,6 +100,10 @@
       */
       void _waitForEvent();
 
+      /**
+      * @brief wait for a new event with timeout
+      */
+      void _waitForEvent(std::uint32_t timeoutMS);
 
       /**
       * @brief This method subscribes the participant to an event type

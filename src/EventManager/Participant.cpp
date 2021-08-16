@@ -11,6 +11,9 @@
  #include <EventManager/Participant.hpp>
  #include <EventManager/Manager.hpp>
  #include <iostream>
+ #include <chrono>
+ using namespace std::chrono_literals;
+
 
 EventManager::Participant::Participant() : manager_(nullptr),
                                   isScheduledByManager_(false), isQueueLocked_(false)
@@ -90,6 +93,14 @@ void EventManager::Participant::_waitForEvent()
   newEventInQueue_.wait(lock);
   isQueueLocked_=true;
 }
+
+void EventManager::Participant::_waitForEvent(std::uint32_t timeoutMS)
+{
+  std::unique_lock<std::mutex> lock(mutexEventQueue_);
+  newEventInQueue_.wait_for(lock,timeoutMS*1ms);
+  isQueueLocked_=true;
+}
+
 
 void EventManager::Participant::_enableScheduling()
 {
