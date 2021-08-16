@@ -94,11 +94,17 @@ void EventManager::Participant::_waitForEvent()
   isQueueLocked_=true;
 }
 
-void EventManager::Participant::_waitForEvent(std::uint32_t timeoutMS)
+bool EventManager::Participant::_waitForEvent(std::uint32_t timeoutMS)
 {
   std::unique_lock<std::mutex> lock(mutexEventQueue_);
-  newEventInQueue_.wait_for(lock,timeoutMS*1ms);
-  isQueueLocked_=true;
+  if (newEventInQueue_.wait_for(lock,timeoutMS*1ms)==std::cv_status::no_timeout)
+  {
+    isQueueLocked_=true;
+    return true;
+  }
+
+  return false;
+
 }
 
 

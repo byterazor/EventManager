@@ -102,8 +102,11 @@
 
       /**
       * @brief wait for a new event with timeout
+      *
+      * @return true  - new event available and queue locked
+      * @return false - no new event, queue not locked, timeout reached
       */
-      void _waitForEvent(std::uint32_t timeoutMS);
+      bool _waitForEvent(std::uint32_t timeoutMS);
 
       /**
       * @brief This method subscribes the participant to an event type
