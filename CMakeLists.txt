@@ -42,17 +42,17 @@ SET(EVENTMANAGER_SOURCES
   src/EventManager/Manager.cpp
 )
 
-add_library(objlib OBJECT ${EVENTMANAGER_SOURCES})
-set_property(TARGET objlib PROPERTY POSITION_INDEPENDENT_CODE 1)
-target_include_directories(objlib
+add_library(em-objlib OBJECT ${EVENTMANAGER_SOURCES})
+set_property(TARGET em-objlib PROPERTY POSITION_INDEPENDENT_CODE 1)
+target_include_directories(em-objlib
   PUBLIC
           include
   PRIVATE
           src
 )
-target_link_libraries(objlib PUBLIC Threads::Threads)
+target_link_libraries(em-objlib PUBLIC Threads::Threads)
 
-add_library(eventmanager SHARED $<TARGET_OBJECTS:objlib>)
+add_library(eventmanager SHARED $<TARGET_OBJECTS:em-objlib>)
 target_include_directories(eventmanager
   PUBLIC
           include
@@ -61,7 +61,7 @@ target_include_directories(eventmanager
 )
 target_link_libraries(eventmanager PUBLIC Threads::Threads)
 
-add_library(eventmanager-static STATIC $<TARGET_OBJECTS:objlib>)
+add_library(eventmanager-static STATIC $<TARGET_OBJECTS:em-objlib>)
 target_include_directories(eventmanager-static
   PUBLIC
           include
