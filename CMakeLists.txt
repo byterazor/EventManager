@@ -70,6 +70,7 @@ target_include_directories(eventmanager-static
 )
 target_link_libraries(eventmanager-static PUBLIC Threads::Threads)
 
+IF(${EM_TESTS})
 #
 # add tests as executable
 #
@@ -80,3 +81,5 @@ catch_discover_tests(test_event)
 add_executable(test_basic tests/test_basic.cpp)
 target_link_libraries(test_basic Catch2::Catch2 eventmanager-static)
 catch_discover_tests(test_basic)
+
+ENDIF()
