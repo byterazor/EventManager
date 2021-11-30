@@ -11,6 +11,7 @@
  #include <EventManager/Manager.hpp>
  #include <EventManager/Participant.hpp>
  #include <iostream>
+ #include <algorithm>
 
  void EventManager::Manager::startMain_()
  {
