@@ -50,6 +50,9 @@
 
      /// map holding all the event type and plugin combinations
      std::map<std::uint32_t, std::list<std::shared_ptr<EventManager::Participant>>> eventMap_;
+    
+     /// mutex to protect the eventMap
+     std::mutex mutexEventMap_;
 
      /// queue for incomng events
      std::queue<std::shared_ptr<EventManager::Event>> eventQueue_;

@@ -12,6 +12,7 @@
  #include <EventManager/Participant.hpp>
  #include <iostream>
  #include <algorithm>
+#include <mutex>
 
  void EventManager::Manager::startMain_()
  {
@@ -207,6 +208,7 @@
 
  void EventManager::Manager::subscribe(std::uint32_t type, std::shared_ptr<EventManager::Participant> participant)
  {
+   std::lock_guard<std::mutex> lockGuard(mutexEventMap_);
 
    // check if participant is already registered
    auto it = eventMap_.find(type);
@@ -231,7 +233,8 @@
 
  void EventManager::Manager::unsubscribe(std::uint32_t type, std::shared_ptr<EventManager::Participant> participant)
  {
-
+   std::lock_guard<std::mutex> lockGuard(mutexEventMap_);
+   
    auto it = eventMap_.find(type);
 
    if (it == eventMap_.end())
