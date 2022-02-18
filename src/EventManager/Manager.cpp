@@ -326,6 +326,17 @@
    }
  }
 
+ void EventManager::Manager::unschedule(std::shared_ptr<EventManager::Participant> participant )
+ {
+   std::lock_guard<std::mutex> guard(mutexSchedulingParticipants_);
+
+   auto it = std::find(schedulingParticipants_.begin(), schedulingParticipants_.end(), participant);
+
+   if (it != schedulingParticipants_.end()) 
+   {
+     schedulingParticipants_.erase(it);
+   }
+ }
 
  void EventManager::Manager::connect(std::shared_ptr<EventManager::Participant> participant)
  {

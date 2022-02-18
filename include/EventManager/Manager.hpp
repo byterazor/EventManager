@@ -191,10 +191,16 @@
       */
       void schedule(std::shared_ptr<EventManager::Participant> plugin);
 
+      /**
+       * @brief remove a participant from scheduling
+       * 
+       * @param participant  - the participant to remove
+       */
+      void unschedule(std::shared_ptr<EventManager::Participant> participant);
 
       /**
-      * @brief method to connect a particpant to the manager
-      */
+        * @brief method to connect a particpant to the manager
+        */
       void connect(std::shared_ptr<EventManager::Participant> participant);
 
       /**
