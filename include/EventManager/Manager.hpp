@@ -75,6 +75,9 @@
      /// mutex to protect participants_
      std::mutex mutexParticipants_;
 
+     /// the id for the next participant connecting
+     std::uint32_t nextParticipantID_;
+
      /*
      * all private methods
      */
@@ -123,7 +126,8 @@
       */
       Manager() : mainThread_(nullptr), isMainThreadRunning_(false),
                        stopMainThread_(false), schedulingThread_(nullptr),
-                       isSchedulingThreadRunning_(false), stopSchedulingThread_(false){}
+                       isSchedulingThreadRunning_(false), stopSchedulingThread_(false),
+                       nextParticipantID_(1){}
 
 
       ~Manager();

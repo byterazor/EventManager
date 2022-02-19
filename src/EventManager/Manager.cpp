@@ -346,6 +346,12 @@
    std::lock_guard<std::mutex> guard(mutexParticipants_);
    particpants_.push_back(participant);
    participant->setManager(shared_from_this());
+
+   // we can set and increment here because only one participant is in this critical
+   // section in any moment
+   participant->setID(nextParticipantID_);
+   nextParticipantID_++;
+   
    participant->init();
  }
 

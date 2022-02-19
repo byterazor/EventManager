@@ -31,6 +31,8 @@
    class Participant : public std::enable_shared_from_this<Participant>
    {
     private:
+      /// a unique id for this participant, helpful for debugging
+      std::uint32_t id_;
 
       /// pointer to the event manager
       std::shared_ptr<EventManager::Manager> manager_;
@@ -159,6 +161,23 @@
       Participant();
 
       void setManager(std::shared_ptr<EventManager::Manager> manager) { manager_=manager;_subscribe(EVENT_TYPE_SHUTDOWN);}
+
+      /**
+       * @brief Method to set the unique id of the participant
+       * 
+       * This method is in general only used by the EventManager::Manager!
+       * Only use this method if you really know what you are doing!
+       *
+       * @param id - the id to set
+       */
+      void setID(const std::uint32_t id) { id_=id;}
+
+      /**
+       * @brief Method to return the unique id of the participant
+       * 
+       * @return std::uint32_t 
+       */
+      std::uint32_t getID() const { return id_;}
 
       /**
       * @brief Method called by the EventManager::Manager to schedule the particpant
