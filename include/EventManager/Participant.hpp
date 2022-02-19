@@ -140,6 +140,11 @@
       void _enableScheduling();
 
       /**
+       * @brief disable scheduling of this particpant through the EventManager::Manager
+       */
+      void _disableScheduling();
+
+      /**
       * @brief check if the participant is scheduled by event manager
       */
       bool isScheduledByManager() const {return isScheduledByManager_;}

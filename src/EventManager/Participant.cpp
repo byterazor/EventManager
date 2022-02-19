@@ -118,6 +118,14 @@ void EventManager::Participant::_enableScheduling()
   isScheduledByManager_=true;
 }
 
+void EventManager::Participant::_disableScheduling() {
+  if (manager_ == nullptr) {
+    throw std::runtime_error("no event manager set yet");
+  }
+  manager_->unschedule(shared_from_this());
+  isScheduledByManager_ = false;
+}
+
 void EventManager::Participant::_subscribe(std::uint32_t type)
 {
   if (manager_ == nullptr)
