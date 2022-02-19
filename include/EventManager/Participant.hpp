@@ -160,6 +160,14 @@
       */
       Participant();
 
+      /**
+       * @brief Method to set the Manager object
+       *
+       * This method is in general only used by the EventManager::Manager!
+       * Only use this method if you really know what you are doing!
+       *
+       * @param manager - the manager to set
+       */
       void setManager(std::shared_ptr<EventManager::Manager> manager) { manager_=manager;_subscribe(EVENT_TYPE_SHUTDOWN);}
 
       /**
