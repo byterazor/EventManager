@@ -198,6 +198,8 @@
        }
      }
      mutexSchedulingParticipants_.unlock();
+
+     processConnections_(); 
      std::this_thread::sleep_for(std::chrono::milliseconds(100));
    }
 
@@ -341,18 +343,34 @@
    }
  }
 
+ void EventManager::Manager::processConnections_()
+ {
+   std::lock_guard<std::mutex> guard(mutexParticipants_);
+   std::lock_guard<std::mutex> lockGuard(mutexConnectionQueue_);
+
+   while(!connectionQueue_.empty())
+   {
+     std::shared_ptr<EventManager::Participant> participant = connectionQueue_.front();
+     connectionQueue_.pop();
+     particpants_.push_back(participant);
+     
+
+     participant->init();
+   } 
+ }
+
  void EventManager::Manager::connect(std::shared_ptr<EventManager::Participant> participant)
  {
    std::lock_guard<std::mutex> guard(mutexParticipants_);
-   particpants_.push_back(participant);
    participant->setManager(shared_from_this());
 
-   // we can set and increment here because only one participant is in this critical
-   // section in any moment
+   // we can set and increment here because only one participant is in this
+   // critical section in any moment
    participant->setID(nextParticipantID_);
    nextParticipantID_++;
-   
-   participant->init();
+
+   connectionQueue_.push(participant);
+
  }
 
  void EventManager::Manager::disconnect(std::shared_ptr<EventManager::Participant> participant)

@@ -78,14 +78,20 @@
      /// the id for the next participant connecting
      std::uint32_t nextParticipantID_;
 
-     /*
-     * all private methods
-     */
+     /// queue for connection request so connecting is done in manager context
+     std::queue<std::shared_ptr<EventManager::Participant>> connectionQueue_;
 
-     /**
-     * @brief the method running in the main thread
-     */
-     void mainProcess_();
+     /// mutex to protect connectionQueue_
+     std::mutex mutexConnectionQueue_;
+
+         /*
+          * all private methods
+          */
+
+         /**
+          * @brief the method running in the main thread
+          */
+         void mainProcess_();
 
      /**
      * @brief the method running in the scheduling thread
@@ -96,6 +102,9 @@
      * @brief process one event (call all the participants)
      */
      void processEvent(const std::shared_ptr<EventManager::Event> event);
+
+
+     void processConnections_();
 
      /**
      * @brief start the main thread
