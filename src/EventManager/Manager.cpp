@@ -352,7 +352,7 @@
    {
      std::shared_ptr<EventManager::Participant> participant = connectionQueue_.front();
      connectionQueue_.pop();
-     particpants_.push_back(participant);
+     participants_.push_back(participant);
      
 
      participant->init();
@@ -375,20 +375,17 @@
 
  void EventManager::Manager::disconnect(std::shared_ptr<EventManager::Participant> participant)
  {
-
    disconnect(participant);
    
    std::lock_guard<std::mutex> guard(mutexParticipants_);
    std::list<std::shared_ptr<EventManager::Participant>>::iterator it;
 
-   it = std::find(particpants_.begin(), particpants_.end(),participant);
+   it = std::find(participants_.begin(), participants_.end(),participant);
 
-   if (it != particpants_.end())
+   if (it != participants_.end())
    {
-     particpants_.erase(it);
+     participants_.erase(it);
    }
-
-
 
    participant->setManager(nullptr);
  }

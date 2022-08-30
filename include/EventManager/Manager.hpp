@@ -70,7 +70,7 @@
      std::mutex mutexSchedulingParticipants_;
 
      /// list of all participants connected
-     std::list<std::shared_ptr<EventManager::Participant>> particpants_;
+     std::list<std::shared_ptr<EventManager::Participant>> participants_;
 
      /// mutex to protect participants_
      std::mutex mutexParticipants_;
