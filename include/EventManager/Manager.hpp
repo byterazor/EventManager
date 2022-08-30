@@ -103,7 +103,14 @@
      */
      void processEvent(const std::shared_ptr<EventManager::Event> event);
 
-
+     /**
+     * @brief adds the queued participants to the list of connected participants
+     *
+     * The connectionQueue_ contains the participants that should be connected to
+     * the manager. All connected participants are stored in the list participants_.
+     * This class function adds the queued participants to the list participants_
+     * and removes them from the queue.
+     */
      void processConnections_();
 
      /**
