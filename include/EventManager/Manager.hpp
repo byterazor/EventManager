@@ -84,6 +84,12 @@
      /// mutex to protect connectionQueue_
      std::mutex mutexConnectionQueue_;
 
+     /// queue for disable scheduling request so the participants are not scheduled by the manager any longer
+     std::queue<std::shared_ptr<EventManager::Participant>> disableScheduleQueue_;
+
+     /// mutex to protect disableScheduleQueue_
+     std::mutex mutexDisableScheduleQueue_;
+
          /*
           * all private methods
           */
@@ -112,6 +118,14 @@
      * and removes them from the queue.
      */
      void processConnections_();
+
+     /**
+     * @brief disables the scheduling of the requested participants
+     *
+     * Removes the participants from the schedulingParticipants_ list that
+     * should not be scheduled anymore.
+     */
+     void processDisableScheduling_();
 
      /**
      * @brief start the main thread

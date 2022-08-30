@@ -200,6 +200,7 @@
      mutexSchedulingParticipants_.unlock();
 
      processConnections_(); 
+     processDisableScheduling_();
      std::this_thread::sleep_for(std::chrono::milliseconds(100));
    }
 
@@ -331,17 +332,13 @@
    }
  }
 
+
  void EventManager::Manager::unschedule(std::shared_ptr<EventManager::Participant> participant )
  {
-   std::lock_guard<std::mutex> guard(mutexSchedulingParticipants_);
-
-   auto it = std::find(schedulingParticipants_.begin(), schedulingParticipants_.end(), participant);
-
-   if (it != schedulingParticipants_.end()) 
-   {
-     schedulingParticipants_.erase(it);
-   }
+   std::lock_guard<std::mutex> guard( mutexDisableScheduleQueue_ );
+   disableScheduleQueue_.push( participant );
  }
+
 
  void EventManager::Manager::processConnections_()
  {
@@ -354,10 +351,30 @@
      connectionQueue_.pop();
      participants_.push_back(participant);
      
-
      participant->init();
    } 
  }
+
+
+ void EventManager::Manager::processDisableScheduling_()
+ {
+   std::lock_guard<std::mutex> guard( mutexDisableScheduleQueue_ );
+   while( disableScheduleQueue_.empty() != true )
+   {
+     std::shared_ptr<EventManager::Participant> participant = disableScheduleQueue_.front();
+     disableScheduleQueue_.pop();
+
+     std::unique_lock<std::mutex> lk(mutexSchedulingParticipants_);
+     auto it = std::find(schedulingParticipants_.begin(), schedulingParticipants_.end(), participant);
+
+     if (it != schedulingParticipants_.end()) 
+     {
+       schedulingParticipants_.erase(it);
+     }
+     lk.unlock();
+   }
+ }
+
 
  void EventManager::Manager::connect(std::shared_ptr<EventManager::Participant> participant)
  {
