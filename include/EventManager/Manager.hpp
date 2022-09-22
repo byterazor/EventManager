@@ -28,6 +28,23 @@
    // forward declaration of EventManager::Participant
    class Participant;
 
+   /**
+     * @class Manager
+     *
+     * If you use the manager it has to be a shared pointer. Otherwise you will 
+     * get a mem error.
+     *
+     * To add participants to the manager call class function connect.
+     * Calling start method will start the manager.
+     *
+     * Depending on your concept you can first connect all participants to 
+     * the manager and then start it. Or you can start in first and then 
+     * connect the participants. In the first example all participant will
+     * be started at the same time (when calling start from the manager.)
+     * In the second example they will be started when they are connected.
+     * That means if you have one starting event that all participants need
+     * to receive you would choose example 1.
+     */
    class Manager : public std::enable_shared_from_this<Manager>
    {
      /// the thread the event manager is transmitting events in
@@ -66,7 +83,7 @@
      /// list of all plugins requiring scheduling
      std::list<std::shared_ptr<EventManager::Participant>> schedulingParticipants_;
 
-     /// mutex to protect schedulingPlugins_
+     /// mutex to protect list schedulingParticipants_
      std::mutex mutexSchedulingParticipants_;
 
      /// list of all participants connected
@@ -152,7 +169,7 @@
       /**
       * @brief The constructor for the event manager
       *
-      * Just initializes all attributes to its starting value
+      * Just initializes all attributes to their starting values
       */
       Manager() : mainThread_(nullptr), isMainThreadRunning_(false),
                        stopMainThread_(false), schedulingThread_(nullptr),
@@ -161,6 +178,7 @@
 
 
       ~Manager();
+
       /**
       * @brief start the event manager
       */

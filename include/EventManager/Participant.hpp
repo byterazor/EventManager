@@ -27,6 +27,9 @@
 
    /**
    * @brief The entity participating in the event system.
+   *
+   * If you want the participant to be scheduled from the manager call 
+   * _enableScheduling class function.
    */
    class Participant : public std::enable_shared_from_this<Participant>
    {

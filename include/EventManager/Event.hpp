@@ -22,7 +22,13 @@
 
    /// Eventtype to notify all participants that a shutdown is immanent
    const static std::uint32_t EVENT_TYPE_SHUTDOWN = 0;
-
+   /**
+     * @class Event
+     * @brief An Event is the element in the system that triggers actions from participants
+     *
+     * Derive own events from this class to sned e.g. also a payload to subscribing 
+     * participants. 
+     */
    class Event
    {
     private:
@@ -45,17 +51,17 @@
       /**
       * @brief constructor for creating a simple event
       *
-      * @param type - what kinf of event is this
+      * @param type - what kind of event is this
       */
       Event(std::uint32_t type);
 
       /**
-      * @brief Constructor to create a response Event
+      * @brief Constructor to create a response event
       */
       Event(std::uint32_t type, const EventManager::Event &event);
 
       /**
-      * @brief Constructor to create a response Event
+      * @brief Constructor to create a response event
       */
       Event(std::uint32_t type, const std::shared_ptr<EventManager::Event> event);
 
