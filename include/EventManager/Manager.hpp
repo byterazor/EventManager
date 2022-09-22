@@ -25,6 +25,21 @@
  namespace EventManager
  {
 
+    /**
+      * @brief command types
+      */
+    enum class commandType :uint16_t
+    {
+      // command to connect a participant to the manager
+      CONNECT,
+      // command to disconnect a participant from the manager
+      DISCONNECT,
+      // command to schedule start scheduling a participant
+      ENABLE_SCHEDULING,
+      // command to disable scheduling for a participant (not schedule it anymore)
+      DISABLE_SCHEDULING
+    }; // commandType
+
    // forward declaration of EventManager::Participant
    class Participant;
 
@@ -95,17 +110,11 @@
      /// the id for the next participant connecting
      std::uint32_t nextParticipantID_;
 
-     /// queue for connection request so connecting is done in manager context
-     std::queue<std::shared_ptr<EventManager::Participant>> connectionQueue_;
+     /// queue for different command requests like e.g. connecting a participant to the manager
+     std::queue<std::pair<EventManager::commandType,std::shared_ptr<EventManager::Participant>>> commandQueue_;
 
-     /// mutex to protect connectionQueue_
-     std::mutex mutexConnectionQueue_;
-
-     /// queue for disable scheduling request so the participants are not scheduled by the manager any longer
-     std::queue<std::shared_ptr<EventManager::Participant>> disableScheduleQueue_;
-
-     /// mutex to protect disableScheduleQueue_
-     std::mutex mutexDisableScheduleQueue_;
+     /// mutex to protect the commandQueue_
+     std::mutex mutexCommandQueue_;
 
          /*
           * all private methods
@@ -127,6 +136,11 @@
      void processEvent(const std::shared_ptr<EventManager::Event> event);
 
      /**
+     * @brief processes the commands in the commandQueue depending on their type 
+     */
+     void processCommands_();
+     
+     /**
      * @brief adds the queued participants to the list of connected participants
      *
      * The connectionQueue_ contains the participants that should be connected to
@@ -134,7 +148,24 @@
      * This class function adds the queued participants to the list participants_
      * and removes them from the queue.
      */
-     void processConnections_();
+     void processConnect_( std::shared_ptr<EventManager::Participant> participant );
+     
+     /**
+     * @brief removes the given participant form the list of connected participants
+     *
+     * The participants_ list contains the participants that are connected to
+     * the manager. This class function removes the queued participants from the list 
+     * participants_.
+     */
+     void processDisconnect_( std::shared_ptr<EventManager::Participant> participant );
+
+     /**
+     * @brief processes the command to enable scheduling for the given participant
+     * 
+     * This class function adds the given participant to the schedulingParticipants_ list
+     * where the participants are scheduled by calling their schedule class function.
+     */
+     void processEnableScheduling_( std::shared_ptr<EventManager::Participant> participant );
 
      /**
      * @brief disables the scheduling of the requested participants
@@ -142,7 +173,7 @@
      * Removes the participants from the schedulingParticipants_ list that
      * should not be scheduled anymore.
      */
-     void processDisableScheduling_();
+     void processDisableScheduling_( std::shared_ptr<EventManager::Participant> participant );
 
      /**
      * @brief start the main thread

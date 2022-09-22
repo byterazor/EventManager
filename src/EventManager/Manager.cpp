@@ -190,18 +190,17 @@
    while(!stopSchedulingThread_)
    {
      mutexSchedulingParticipants_.lock();
-     if (!schedulingParticipants_.empty())
+     if( !schedulingParticipants_.empty() )
      {
-       for (auto it = schedulingParticipants_.begin(); it != schedulingParticipants_.end(); ++it)
+       for( auto it = schedulingParticipants_.begin(); it != schedulingParticipants_.end(); ++it )
        {
          (*it)->schedule();
        }
      }
      mutexSchedulingParticipants_.unlock();
 
-     processConnections_(); 
-     processDisableScheduling_();
-     std::this_thread::sleep_for(std::chrono::milliseconds(100));
+     processCommands_();
+     std::this_thread::sleep_for( std::chrono::milliseconds(100) );
    }
 
    isSchedulingThreadRunning_=false;
@@ -320,89 +319,113 @@
 
  }
 
- void EventManager::Manager::schedule(std::shared_ptr<EventManager::Participant> participant)
- {
-   std::lock_guard<std::mutex> guard(mutexSchedulingParticipants_);
-
-   auto it = std::find(schedulingParticipants_.begin(), schedulingParticipants_.end(), participant);
-
-   if (it == schedulingParticipants_.end())
-   {
-     schedulingParticipants_.push_back(participant);
-   }
- }
+void EventManager::Manager::schedule(std::shared_ptr<EventManager::Participant> participant)
+{
+  std::lock_guard<std::mutex> guard( mutexCommandQueue_ );
+  commandQueue_.push( std::make_pair( EventManager::commandType::ENABLE_SCHEDULING, participant) );
+}
 
 
- void EventManager::Manager::unschedule(std::shared_ptr<EventManager::Participant> participant )
- {
-   std::lock_guard<std::mutex> guard( mutexDisableScheduleQueue_ );
-   disableScheduleQueue_.push( participant );
- }
+void EventManager::Manager::unschedule(std::shared_ptr<EventManager::Participant> participant )
+{
+  std::lock_guard<std::mutex> guard( mutexCommandQueue_ );
+  commandQueue_.push( std::make_pair( EventManager::commandType::DISABLE_SCHEDULING, participant) );
+}
 
 
- void EventManager::Manager::processConnections_()
- {
-   std::lock_guard<std::mutex> guard(mutexParticipants_);
-   std::lock_guard<std::mutex> lockGuard(mutexConnectionQueue_);
-
-   while(!connectionQueue_.empty())
-   {
-     std::shared_ptr<EventManager::Participant> participant = connectionQueue_.front();
-     connectionQueue_.pop();
-     participants_.push_back(participant);
-     
-     participant->init();
-   } 
- }
-
-
- void EventManager::Manager::processDisableScheduling_()
- {
-   std::lock_guard<std::mutex> guard( mutexDisableScheduleQueue_ );
-   while( disableScheduleQueue_.empty() != true )
-   {
-     std::shared_ptr<EventManager::Participant> participant = disableScheduleQueue_.front();
-     disableScheduleQueue_.pop();
-
-     std::unique_lock<std::mutex> lk(mutexSchedulingParticipants_);
-     auto it = std::find(schedulingParticipants_.begin(), schedulingParticipants_.end(), participant);
-
-     if (it != schedulingParticipants_.end()) 
-     {
-       schedulingParticipants_.erase(it);
-     }
-     lk.unlock();
-   }
- }
+void EventManager::Manager::processCommands_()
+{
+  std::unique_lock<std::mutex> lk( mutexCommandQueue_ );
+  while( commandQueue_.empty() == false )
+  {
+    auto pair = commandQueue_.front();
+    commandQueue_.pop();
+    lk.unlock();
+    switch( pair.first )
+    {
+      case EventManager::commandType::CONNECT:
+        processConnect_( pair.second );
+        break;
+      case EventManager::commandType::DISCONNECT:
+        processDisconnect_( pair.second );
+        break;
+      case EventManager::commandType::ENABLE_SCHEDULING:
+        processEnableScheduling_( pair.second );
+        break;
+      case EventManager::commandType::DISABLE_SCHEDULING:
+        processDisableScheduling_( pair.second );
+        break;
+    }
+    lk.lock();
+  }
+  lk.unlock();
+}
 
 
- void EventManager::Manager::connect(std::shared_ptr<EventManager::Participant> participant)
- {
-   std::lock_guard<std::mutex> guard(mutexParticipants_);
-   participant->setManager(shared_from_this());
+void EventManager::Manager::processConnect_( std::shared_ptr<EventManager::Participant> participant )
+{
+  std::lock_guard<std::mutex> guard(mutexParticipants_);
+  auto it = std::find( participants_.begin(), participants_.end(), participant );
+  if( it == participants_.end() )
+  {
+    participant->setManager(shared_from_this());
+    participant->setID(nextParticipantID_);
+    // we can set and increment here because this critical section is secured by a mutex
+    nextParticipantID_++;
+    participants_.push_back(participant);
+    participant->init();
+  }
+}
 
-   // we can set and increment here because only one participant is in this
-   // critical section in any moment
-   participant->setID(nextParticipantID_);
-   nextParticipantID_++;
 
-   connectionQueue_.push(participant);
+void EventManager::Manager::processDisconnect_( std::shared_ptr<EventManager::Participant> participant )
+{
+  // before the participant gets disconnected it has to be unscheduled
+  processDisableScheduling_( participant ); 
 
- }
+  std::lock_guard<std::mutex> guard(mutexParticipants_);
+  auto it = std::find( participants_.begin(), participants_.end(), participant );
+  if( it != participants_.end() )
+  {
+    participant->setManager(nullptr);
+    participants_.erase( it );
+  }
+}
 
- void EventManager::Manager::disconnect(std::shared_ptr<EventManager::Participant> participant)
- {
-   disconnect(participant);
-   
-   std::lock_guard<std::mutex> guard(mutexParticipants_);
-   std::list<std::shared_ptr<EventManager::Participant>>::iterator it;
 
-   it = std::find(participants_.begin(), participants_.end(),participant);
+void EventManager::Manager::processEnableScheduling_( std::shared_ptr<EventManager::Participant> participant )
+{
+  std::lock_guard<std::mutex> guard(mutexSchedulingParticipants_);
+  auto it = std::find( schedulingParticipants_.begin(), schedulingParticipants_.end(), participant );
 
-   if (it != participants_.end())
-   {
-     participants_.erase(it);
-   }
+  if( it == schedulingParticipants_.end() )
+  {
+    schedulingParticipants_.push_back( participant );
+  }
+}
 
-   participant->setManager(nullptr);
- }
+
+void EventManager::Manager::processDisableScheduling_( std::shared_ptr<EventManager::Participant> participant )
+{
+  std::lock_guard<std::mutex> guard( mutexSchedulingParticipants_ );
+  auto it = std::find( schedulingParticipants_.begin(), schedulingParticipants_.end(), participant );
+
+  if( it != schedulingParticipants_.end() ) 
+  {
+    schedulingParticipants_.erase(it);
+  }
+}
+
+
+void EventManager::Manager::connect( std::shared_ptr<EventManager::Participant> participant )
+{
+  std::lock_guard<std::mutex> guard( mutexCommandQueue_ );
+  commandQueue_.push( std::make_pair( EventManager::commandType::CONNECT, participant) );
+}
+
+
+void EventManager::Manager::disconnect( std::shared_ptr<EventManager::Participant> participant )
+{ 
+  std::lock_guard<std::mutex> guard( mutexCommandQueue_ );
+  commandQueue_.push( std::make_pair( EventManager::commandType::DISCONNECT, participant) );
+}
