@@ -162,6 +162,11 @@
       */
       void disconnect(std::shared_ptr<EventManager::Participant> participant);
 
+      /**
+      * @brief disconnect this participant from the event manager 
+      */
+      void disconnect();
+
     public:
       /**
       * @brief Constructor setting the participant up for use
