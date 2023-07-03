@@ -383,6 +383,9 @@ void EventManager::Manager::processDisconnect_( std::shared_ptr<EventManager::Pa
   // before the participant gets disconnected it has to be unscheduled
   processDisableScheduling_( participant ); 
 
+  // unsubscribe plugin from all events
+  unsubscribe(participant);
+
   std::lock_guard<std::mutex> guard(mutexParticipants_);
   auto it = std::find( participants_.begin(), participants_.end(), participant );
   if( it != participants_.end() )
