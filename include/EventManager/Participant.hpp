@@ -181,7 +181,13 @@
        *
        * @param manager - the manager to set
        */
-      void setManager(std::shared_ptr<EventManager::Manager> manager) { manager_=manager;_subscribe(EVENT_TYPE_SHUTDOWN);}
+      void setManager(std::shared_ptr<EventManager::Manager> manager) 
+        {   manager_=manager; 
+            if (manager_!=nullptr)
+            {
+              _subscribe(EVENT_TYPE_SHUTDOWN);
+            }
+        }
 
       /**
        * @brief Method to set the unique id of the participant
