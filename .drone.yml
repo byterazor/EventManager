@@ -1,0 +1,48 @@
+kind: pipeline
+type: kubernetes
+name: build-amd64
+platform:
+  arch: amd64
+node_selector:
+  kubernetes.io/arch: amd64
+
+steps:
+  - name: submodules
+    image: alpine/git
+    commands:
+      - git submodule update --init --recursive
+
+  - name: build-amd64
+    image: debian:bookworm-slim
+    commands:
+        - apt-get update
+        - apt-get -qy install gcc-12 cmake make build-essential 
+        - mkdir build
+        - cd build; cmake ..
+        - make -j 4 
+        - make test
+
+--- 
+kind: pipeline
+type: kubernetes
+name: build-arm64
+platform:
+  arch: arm64
+node_selector:
+  kubernetes.io/arch: arm64
+
+steps:
+  - name: submodules
+    image: alpine/git
+    commands:
+      - git submodule update --init --recursive
+
+  - name: build-arm64
+    image: debian:bookworm-slim
+    commands:
+        - apt-get update
+        - apt-get -qy install gcc-12 cmake make build-essential
+        - mkdir build
+        - cd build; cmake ..
+        - make -j 4 
+        - make test
