@@ -42,7 +42,7 @@
       std::uint64_t responseId_;
 
       /// identifies if this event is a response to another event
-      std::atomic<bool> isResponse_;
+      bool isResponse_;
 
       /// emitter of the event
       std::shared_ptr<EventManager::Participant> emitter_;
