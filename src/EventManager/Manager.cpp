@@ -88,7 +88,10 @@
      throw std::runtime_error("can not stop main thread");
    }
 
-   mainThread_->join();
+    if (mainThread_->joinable())
+    {
+      mainThread_->join();
+    }
  }
 
  void EventManager::Manager::stopScheduling_()
@@ -107,8 +110,11 @@
      throw std::runtime_error("can not stop scheduling thread");
    }
 
-   schedulingThread_->join();
- }
+    if (schedulingThread_->joinable())
+    {
+      schedulingThread_->join();
+    }
+}
 
  void EventManager::Manager::start()
  {
