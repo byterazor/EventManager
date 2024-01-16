@@ -294,6 +294,11 @@
  bool EventManager::Manager::empty() const
  {
    bool isEmpty=true;
+  
+   while(!commandQueue_.empty())
+   {
+     std::this_thread::sleep_for(std::chrono::milliseconds(100));
+   }
 
    for (auto it = eventMap_.begin(); it != eventMap_.end(); ++it)
    {

@@ -87,6 +87,11 @@ SCENARIO("Basic Usage of EventManager", "[Manager]")
       manager = std::make_shared<EventManager::Manager>();
     }());
 
+    REQUIRE_NOTHROW([&]()
+    {
+      manager->start();
+    }());
+
     REQUIRE(manager->empty() == true);
 
     std::shared_ptr<myParticipant> participant0;
@@ -106,11 +111,6 @@ SCENARIO("Basic Usage of EventManager", "[Manager]")
     }());
 
     REQUIRE(manager->empty() == false);
-
-    REQUIRE_NOTHROW([&]()
-    {
-      manager->start();
-    }());
 
     REQUIRE(manager->isRunning() == true);
 
