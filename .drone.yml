@@ -46,3 +46,34 @@ steps:
         - cd build; cmake ..
         - make -j 4 
         - make test
+
+---
+
+kind: pipeline
+type: kubernetes
+name: mirror-to-github
+node_selector:
+  kubernetes.io/arch: amd64
+  federationhq.de/location: Blumendorf
+  federationhq.de/compute: true
+steps:
+  - name: github-mirror
+    image: registry.cloud.federationhq.de/drone-github-mirror:latest
+    pull: always
+    settings:
+      GH_TOKEN: 
+        from_secret: GH_TOKEN
+      GH_REPO: "byterazor/EventManager"
+      GH_REPO_DESC: "very simple C++ Event System"
+      GH_REPO_HOMEPAGE: "https://rm.byterazor.de/projects/eventmanager"
+depends_on:
+  - build-amd64
+  - build-arm64
+
+
+--- 
+kind: secret
+name: GH_TOKEN
+get:
+  path: github
+  name: token
