@@ -7,7 +7,7 @@
 #  This file is part of the EventManager distribution hosted at https://gitea.federationhq.de/byterazor/EventManager.git
 #
 
-cmake_minimum_required (VERSION 3.1 FATAL_ERROR)
+cmake_minimum_required (VERSION 3.20 FATAL_ERROR)
 project (EventManager VERSION 0.0.1 LANGUAGES  CXX)
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules )
 
